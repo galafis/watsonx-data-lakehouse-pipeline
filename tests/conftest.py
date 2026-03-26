@@ -13,6 +13,31 @@ import pytest
 
 
 @pytest.fixture(autouse=True)
+def _mock_pyspark_functions():
+    """Patch pyspark.sql.functions to avoid SparkContext requirement in tests."""
+    mock_fn = MagicMock()
+    patchers = [
+        patch("pyspark.sql.functions.col", side_effect=lambda x: MagicMock(name=f"col_{x}")),
+        patch("pyspark.sql.functions.lit", side_effect=lambda x: MagicMock(name=f"lit_{x}")),
+        patch("pyspark.sql.functions.current_timestamp", return_value=mock_fn),
+        patch("pyspark.sql.functions.to_date", side_effect=lambda *a: mock_fn),
+        patch("pyspark.sql.functions.when", side_effect=lambda *a: mock_fn),
+        patch("pyspark.sql.functions.avg", side_effect=lambda *a: mock_fn),
+        patch("pyspark.sql.functions.stddev", side_effect=lambda *a: mock_fn),
+        patch("pyspark.sql.functions.min", side_effect=lambda *a: mock_fn),
+        patch("pyspark.sql.functions.max", side_effect=lambda *a: mock_fn),
+        patch("pyspark.sql.functions.count", side_effect=lambda *a: mock_fn),
+        patch("pyspark.sql.functions.sum", side_effect=lambda *a: mock_fn),
+        patch("pyspark.sql.functions.window", side_effect=lambda *a, **kw: mock_fn),
+    ]
+    for p in patchers:
+        p.start()
+    yield
+    for p in patchers:
+        p.stop()
+
+
+@pytest.fixture(autouse=True)
 def mock_yaml_config():
     """Mock YAML configuration for all tests."""
     config = {
