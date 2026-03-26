@@ -13,17 +13,13 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 
 class TestSilverLayerInit:
     """Tests for SilverLayer initialization."""
 
     @patch("src.lakehouse.silver.get_settings")
     @patch("src.lakehouse.silver.get_yaml_config")
-    def test_initialization(
-        self, mock_yaml: MagicMock, mock_settings: MagicMock
-    ) -> None:
+    def test_initialization(self, mock_yaml: MagicMock, mock_settings: MagicMock) -> None:
         """Verify SilverLayer initializes with correct paths and config."""
         mock_settings.return_value = MagicMock(
             lakehouse=MagicMock(
@@ -80,7 +76,7 @@ class TestSilverLayerDeduplicate:
         mock_df.count.return_value = 100
         deduped_df.count.return_value = 95
 
-        result = layer.deduplicate(mock_df)
+        layer.deduplicate(mock_df)
 
         mock_df.withColumn.assert_called_once()
 
@@ -109,7 +105,7 @@ class TestSilverLayerClean:
         chain_df.withColumn.return_value = chain_df
         chain_df.filter.return_value = chain_df
 
-        result = layer.clean(mock_df)
+        layer.clean(mock_df)
 
         mock_df.withColumn.assert_called_once()
 
@@ -137,7 +133,7 @@ class TestSilverLayerEnrich:
         mock_df.withColumn.return_value = enriched
         enriched.withColumn.return_value = enriched
 
-        result = layer.enrich(mock_df)
+        layer.enrich(mock_df)
 
         mock_df.withColumn.assert_called_once()
 
@@ -147,9 +143,7 @@ class TestSilverLayerProcess:
 
     @patch("src.lakehouse.silver.get_settings")
     @patch("src.lakehouse.silver.get_yaml_config")
-    def test_process_full_load(
-        self, mock_yaml: MagicMock, mock_settings: MagicMock
-    ) -> None:
+    def test_process_full_load(self, mock_yaml: MagicMock, mock_settings: MagicMock) -> None:
         """Verify process handles full load when no silver data exists."""
         mock_settings.return_value = MagicMock(
             lakehouse=MagicMock(silver_path="/test/silver", bronze_path="/test/bronze")
@@ -197,12 +191,11 @@ class TestSilverLayerProcess:
 
         layer = SilverLayer(spark)
 
-        with patch.object(layer, "deduplicate") as mock_dedup:
-            with patch.object(layer, "clean") as mock_clean:
-                with patch.object(layer, "enrich") as mock_enrich:
-                    mock_enrich.return_value.count.return_value = 0
-                    result = layer.process(incremental=False)
-                    assert result == 0
+        with patch.object(layer, "deduplicate"), patch.object(layer, "clean"):
+            with patch.object(layer, "enrich") as mock_enrich:
+                mock_enrich.return_value.count.return_value = 0
+                result = layer.process(incremental=False)
+                assert result == 0
 
 
 class TestSilverLayerStats:

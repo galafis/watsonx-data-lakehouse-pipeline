@@ -7,8 +7,6 @@ with derived columns.
 
 from __future__ import annotations
 
-from typing import Optional
-
 import structlog
 from pyspark.sql import DataFrame, SparkSession, Window
 from pyspark.sql import functions as F
@@ -103,11 +101,7 @@ class SilverLayer:
             .withColumn("sensor_id", F.trim(F.col("sensor_id")))
             .withColumn("facility_id", F.trim(F.col("facility_id")))
             .filter(F.col("value").isNotNull())
-            .filter(
-                F.col("sensor_type").isin(
-                    "temperature", "vibration", "pressure", "throughput"
-                )
-            )
+            .filter(F.col("sensor_type").isin("temperature", "vibration", "pressure", "throughput"))
         )
 
         logger.info("data_cleaning_complete")
@@ -127,9 +121,7 @@ class SilverLayer:
         """
         # Rolling window for statistics (per sensor, last 100 readings)
         sensor_window = (
-            Window.partitionBy("sensor_id", "sensor_type")
-            .orderBy("timestamp")
-            .rowsBetween(-99, 0)
+            Window.partitionBy("sensor_id", "sensor_type").orderBy("timestamp").rowsBetween(-99, 0)
         )
 
         enriched = (
@@ -168,13 +160,9 @@ class SilverLayer:
         if incremental:
             try:
                 existing_silver = self.spark.read.parquet(self.silver_path)
-                max_timestamp = existing_silver.agg(
-                    F.max("ingestion_timestamp")
-                ).collect()[0][0]
+                max_timestamp = existing_silver.agg(F.max("ingestion_timestamp")).collect()[0][0]
                 if max_timestamp:
-                    bronze_df = bronze_df.filter(
-                        F.col("ingestion_timestamp") > max_timestamp
-                    )
+                    bronze_df = bronze_df.filter(F.col("ingestion_timestamp") > max_timestamp)
             except Exception:
                 logger.info("silver_full_load", reason="no_existing_silver_data")
 
@@ -193,9 +181,9 @@ class SilverLayer:
 
     def read(
         self,
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None,
-        facility_id: Optional[str] = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        facility_id: str | None = None,
     ) -> DataFrame:
         """Read data from the silver layer with optional filters.
 
@@ -228,9 +216,7 @@ class SilverLayer:
             df = self.spark.read.parquet(self.silver_path)
             return {
                 "total_rows": df.count(),
-                "avg_quality_score": float(
-                    df.agg(F.avg("quality_score")).collect()[0][0] or 0
-                ),
+                "avg_quality_score": float(df.agg(F.avg("quality_score")).collect()[0][0] or 0),
                 "anomaly_rate": float(
                     df.agg(F.avg(F.col("is_anomaly").cast("double"))).collect()[0][0] or 0
                 ),

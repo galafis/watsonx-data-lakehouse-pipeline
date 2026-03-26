@@ -151,9 +151,13 @@ class DataProfiler:
                     "min": float(agg_result["min"]) if agg_result["min"] is not None else None,
                     "max": float(agg_result["max"]) if agg_result["max"] is not None else None,
                     "mean": round(float(agg_result["mean"]), 4) if agg_result["mean"] else None,
-                    "stddev": round(float(agg_result["stddev"]), 4) if agg_result["stddev"] else None,
+                    "stddev": round(float(agg_result["stddev"]), 4)
+                    if agg_result["stddev"]
+                    else None,
                     "p25": float(agg_result["p25"]) if agg_result["p25"] is not None else None,
-                    "median": float(agg_result["median"]) if agg_result["median"] is not None else None,
+                    "median": float(agg_result["median"])
+                    if agg_result["median"] is not None
+                    else None,
                     "p75": float(agg_result["p75"]) if agg_result["p75"] is not None else None,
                 }
 
@@ -184,12 +188,8 @@ class DataProfiler:
         Returns:
             Dictionary with report summary and recommendations.
         """
-        high_null_columns = [
-            c.name for c in profile.columns if c.null_rate > 0.05
-        ]
-        low_cardinality = [
-            c.name for c in profile.columns if c.distinct_count <= 5
-        ]
+        high_null_columns = [c.name for c in profile.columns if c.null_rate > 0.05]
+        low_cardinality = [c.name for c in profile.columns if c.distinct_count <= 5]
 
         recommendations = []
         if high_null_columns:

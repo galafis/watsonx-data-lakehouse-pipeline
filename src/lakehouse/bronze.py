@@ -8,7 +8,6 @@ metadata and partitioning).
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
 
 import structlog
 from pyspark.sql import DataFrame, SparkSession
@@ -72,9 +71,7 @@ class BronzeLayer:
 
         row_count = enriched.count()
 
-        enriched.write.mode("append").partitionBy(*self.partition_columns).parquet(
-            self.bronze_path
-        )
+        enriched.write.mode("append").partitionBy(*self.partition_columns).parquet(self.bronze_path)
 
         logger.info(
             "bronze_batch_ingested",
@@ -86,9 +83,9 @@ class BronzeLayer:
 
     def read(
         self,
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None,
-        sensor_type: Optional[str] = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        sensor_type: str | None = None,
     ) -> DataFrame:
         """Read data from the bronze layer with optional filters.
 

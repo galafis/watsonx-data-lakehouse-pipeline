@@ -102,8 +102,16 @@ class TestGetSparkSchema:
     def test_schema_has_expected_field_names(self) -> None:
         """Verify the schema includes all IoT event fields."""
         expected_fields = {
-            "event_id", "sensor_id", "sensor_type", "facility_id",
-            "timestamp", "value", "unit", "quality_score", "is_anomaly", "metadata",
+            "event_id",
+            "sensor_id",
+            "sensor_type",
+            "facility_id",
+            "timestamp",
+            "value",
+            "unit",
+            "quality_score",
+            "is_anomaly",
+            "metadata",
         }
 
         mock_fields = []
@@ -117,6 +125,7 @@ class TestGetSparkSchema:
 
         with patch("src.ingestion.schema_registry.get_spark_schema", return_value=mock_schema):
             from src.ingestion.schema_registry import get_spark_schema
+
             schema = get_spark_schema()
             field_names = {f.name for f in schema.fields}
             assert field_names == expected_fields

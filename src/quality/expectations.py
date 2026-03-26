@@ -109,8 +109,13 @@ class IoTDataQualitySuite:
             List of expectation results for schema checks.
         """
         required_columns = [
-            "event_id", "sensor_id", "sensor_type", "facility_id",
-            "timestamp", "value", "unit",
+            "event_id",
+            "sensor_id",
+            "sensor_type",
+            "facility_id",
+            "timestamp",
+            "value",
+            "unit",
         ]
         results = []
         actual_columns = set(df.columns)

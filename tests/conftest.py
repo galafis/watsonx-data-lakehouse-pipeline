@@ -143,18 +143,20 @@ def sample_events() -> list[dict]:
         ("pressure", "bar", 6.0),
         ("throughput", "units/hr", 150.0),
     ]
-    for i, (stype, unit, baseline) in enumerate(sensor_types):
+    for _i, (stype, unit, baseline) in enumerate(sensor_types):
         for j in range(5):
-            events.append({
-                "event_id": f"evt-{stype}-{j:03d}",
-                "sensor_id": f"sensor-{stype}-{j:03d}",
-                "sensor_type": stype,
-                "facility_id": f"PLANT-{'ABC'[j % 3]}",
-                "timestamp": (base_time - timedelta(minutes=j * 5)).isoformat(),
-                "value": baseline + (j * 0.5),
-                "unit": unit,
-                "quality_score": 0.95 + (j * 0.01),
-                "is_anomaly": j == 4,
-                "metadata": None,
-            })
+            events.append(
+                {
+                    "event_id": f"evt-{stype}-{j:03d}",
+                    "sensor_id": f"sensor-{stype}-{j:03d}",
+                    "sensor_type": stype,
+                    "facility_id": f"PLANT-{'ABC'[j % 3]}",
+                    "timestamp": (base_time - timedelta(minutes=j * 5)).isoformat(),
+                    "value": baseline + (j * 0.5),
+                    "unit": unit,
+                    "quality_score": 0.95 + (j * 0.01),
+                    "is_anomaly": j == 4,
+                    "metadata": None,
+                }
+            )
     return events

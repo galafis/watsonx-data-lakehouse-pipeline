@@ -27,10 +27,7 @@ def create_spark_session() -> SparkSession:
     spark_config = yaml_config.get("spark", {}).get("config", {})
     packages = yaml_config.get("spark", {}).get("packages", [])
 
-    builder = (
-        SparkSession.builder.appName(settings.spark.app_name)
-        .master(settings.spark.master)
-    )
+    builder = SparkSession.builder.appName(settings.spark.app_name).master(settings.spark.master)
 
     if packages:
         builder = builder.config("spark.jars.packages", ",".join(packages))
@@ -103,11 +100,7 @@ def validate_stream(df: DataFrame) -> DataFrame:
         .filter(F.col("sensor_id").isNotNull())
         .filter(F.col("timestamp").isNotNull())
         .filter(F.col("value").isNotNull())
-        .filter(
-            F.col("sensor_type").isin(
-                "temperature", "vibration", "pressure", "throughput"
-            )
-        )
+        .filter(F.col("sensor_type").isin("temperature", "vibration", "pressure", "throughput"))
     )
 
     logger.info("stream_validation_configured")
@@ -152,9 +145,7 @@ def main() -> None:
 
     write_to_bronze(
         df=validated,
-        checkpoint_dir=lakehouse_config.get(
-            "checkpoint_dir", "s3a://lakehouse/checkpoints/bronze"
-        ),
+        checkpoint_dir=lakehouse_config.get("checkpoint_dir", "s3a://lakehouse/checkpoints/bronze"),
         output_path=settings.lakehouse.bronze_path,
     )
 

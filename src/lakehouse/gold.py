@@ -6,8 +6,6 @@ and anomaly scores ready for consumption by dashboards and reports.
 
 from __future__ import annotations
 
-from typing import Optional
-
 import structlog
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
@@ -42,9 +40,7 @@ class GoldLayer:
 
         self.gold_path = settings.lakehouse.gold_path
         self.silver_path = settings.lakehouse.silver_path
-        self.partition_columns = gold_config.get(
-            "partition_columns", ["kpi_date", "facility_id"]
-        )
+        self.partition_columns = gold_config.get("partition_columns", ["kpi_date", "facility_id"])
         self.aggregation_window = gold_config.get("aggregation_window_minutes", 15)
 
         logger.info("gold_layer_initialized", path=self.gold_path)
@@ -159,8 +155,8 @@ class GoldLayer:
 
     def read_kpis(
         self,
-        facility_id: Optional[str] = None,
-        kpi_date: Optional[str] = None,
+        facility_id: str | None = None,
+        kpi_date: str | None = None,
     ) -> DataFrame:
         """Read KPI data from the gold layer.
 
@@ -180,7 +176,7 @@ class GoldLayer:
 
         return df
 
-    def read_anomaly_scores(self, facility_id: Optional[str] = None) -> DataFrame:
+    def read_anomaly_scores(self, facility_id: str | None = None) -> DataFrame:
         """Read anomaly scores from the gold layer.
 
         Args:
@@ -209,8 +205,7 @@ class GoldLayer:
                 "total_kpi_rows": kpis.count(),
                 "total_anomaly_rows": anomalies.count(),
                 "facilities": [
-                    row["facility_id"]
-                    for row in kpis.select("facility_id").distinct().collect()
+                    row["facility_id"] for row in kpis.select("facility_id").distinct().collect()
                 ],
                 "layer": "gold",
             }

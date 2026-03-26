@@ -7,7 +7,7 @@ completeness percentages, and alerting for violations.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from typing import Any
 
@@ -77,9 +77,7 @@ class SLAMonitor:
         sla_config = yaml_config.get("governance", {}).get("sla", {})
 
         self.freshness_threshold_minutes = sla_config.get("freshness_threshold_minutes", 30)
-        self.completeness_threshold_percent = sla_config.get(
-            "completeness_threshold_percent", 95.0
-        )
+        self.completeness_threshold_percent = sla_config.get("completeness_threshold_percent", 95.0)
         self.alert_channels = sla_config.get("alert_channels", ["log"])
         self.check_history: list[SLACheck] = []
 
@@ -155,10 +153,7 @@ class SLAMonitor:
         Returns:
             SLACheck result for completeness.
         """
-        if expected_count == 0:
-            completeness = 100.0
-        else:
-            completeness = (actual_count / expected_count) * 100
+        completeness = 100.0 if expected_count == 0 else actual_count / expected_count * 100
 
         if completeness >= self.completeness_threshold_percent:
             status = SLAStatus.COMPLIANT

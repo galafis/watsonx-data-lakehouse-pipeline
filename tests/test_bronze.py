@@ -10,9 +10,7 @@ Tests cover:
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, PropertyMock, call, patch
-
-import pytest
+from unittest.mock import MagicMock, patch
 
 
 class TestBronzeLayerInit:
@@ -24,9 +22,7 @@ class TestBronzeLayerInit:
         self, mock_yaml: MagicMock, mock_settings: MagicMock
     ) -> None:
         """Verify BronzeLayer initializes with correct path and partition columns."""
-        mock_settings.return_value = MagicMock(
-            lakehouse=MagicMock(bronze_path="/test/bronze")
-        )
+        mock_settings.return_value = MagicMock(lakehouse=MagicMock(bronze_path="/test/bronze"))
         mock_yaml.return_value = {
             "lakehouse": {
                 "bronze": {
@@ -52,9 +48,7 @@ class TestBronzeLayerInit:
         self, mock_yaml: MagicMock, mock_settings: MagicMock
     ) -> None:
         """Verify BronzeLayer uses defaults when YAML config is empty."""
-        mock_settings.return_value = MagicMock(
-            lakehouse=MagicMock(bronze_path="/default/bronze")
-        )
+        mock_settings.return_value = MagicMock(lakehouse=MagicMock(bronze_path="/default/bronze"))
         mock_yaml.return_value = {}
 
         from src.lakehouse.bronze import BronzeLayer
@@ -73,9 +67,7 @@ class TestBronzeLayerIngest:
         self, mock_yaml: MagicMock, mock_settings: MagicMock
     ) -> None:
         """Verify ingest_batch enriches data with ingestion metadata."""
-        mock_settings.return_value = MagicMock(
-            lakehouse=MagicMock(bronze_path="/test/bronze")
-        )
+        mock_settings.return_value = MagicMock(lakehouse=MagicMock(bronze_path="/test/bronze"))
         mock_yaml.return_value = {"lakehouse": {"bronze": {}}}
 
         from src.lakehouse.bronze import BronzeLayer
@@ -101,9 +93,7 @@ class TestBronzeLayerIngest:
         self, mock_yaml: MagicMock, mock_settings: MagicMock
     ) -> None:
         """Verify ingest_batch writes to partitioned Parquet format."""
-        mock_settings.return_value = MagicMock(
-            lakehouse=MagicMock(bronze_path="/test/bronze")
-        )
+        mock_settings.return_value = MagicMock(lakehouse=MagicMock(bronze_path="/test/bronze"))
         mock_yaml.return_value = {"lakehouse": {"bronze": {}}}
 
         from src.lakehouse.bronze import BronzeLayer
@@ -128,13 +118,9 @@ class TestBronzeLayerRead:
 
     @patch("src.lakehouse.bronze.get_settings")
     @patch("src.lakehouse.bronze.get_yaml_config")
-    def test_read_without_filters(
-        self, mock_yaml: MagicMock, mock_settings: MagicMock
-    ) -> None:
+    def test_read_without_filters(self, mock_yaml: MagicMock, mock_settings: MagicMock) -> None:
         """Verify read returns full DataFrame when no filters are specified."""
-        mock_settings.return_value = MagicMock(
-            lakehouse=MagicMock(bronze_path="/test/bronze")
-        )
+        mock_settings.return_value = MagicMock(lakehouse=MagicMock(bronze_path="/test/bronze"))
         mock_yaml.return_value = {"lakehouse": {"bronze": {}}}
 
         from src.lakehouse.bronze import BronzeLayer
@@ -148,13 +134,9 @@ class TestBronzeLayerRead:
 
     @patch("src.lakehouse.bronze.get_settings")
     @patch("src.lakehouse.bronze.get_yaml_config")
-    def test_read_with_date_filter(
-        self, mock_yaml: MagicMock, mock_settings: MagicMock
-    ) -> None:
+    def test_read_with_date_filter(self, mock_yaml: MagicMock, mock_settings: MagicMock) -> None:
         """Verify read applies date filters correctly."""
-        mock_settings.return_value = MagicMock(
-            lakehouse=MagicMock(bronze_path="/test/bronze")
-        )
+        mock_settings.return_value = MagicMock(lakehouse=MagicMock(bronze_path="/test/bronze"))
         mock_yaml.return_value = {"lakehouse": {"bronze": {}}}
 
         from src.lakehouse.bronze import BronzeLayer
@@ -165,7 +147,7 @@ class TestBronzeLayerRead:
         mock_df.filter.return_value = mock_df
 
         layer = BronzeLayer(spark)
-        result = layer.read(start_date="2024-01-01", end_date="2024-12-31")
+        layer.read(start_date="2024-01-01", end_date="2024-12-31")
 
         assert mock_df.filter.call_count == 2
 
@@ -175,9 +157,7 @@ class TestBronzeLayerRead:
         self, mock_yaml: MagicMock, mock_settings: MagicMock
     ) -> None:
         """Verify read applies sensor type filter correctly."""
-        mock_settings.return_value = MagicMock(
-            lakehouse=MagicMock(bronze_path="/test/bronze")
-        )
+        mock_settings.return_value = MagicMock(lakehouse=MagicMock(bronze_path="/test/bronze"))
         mock_yaml.return_value = {"lakehouse": {"bronze": {}}}
 
         from src.lakehouse.bronze import BronzeLayer
@@ -198,13 +178,9 @@ class TestBronzeLayerStats:
 
     @patch("src.lakehouse.bronze.get_settings")
     @patch("src.lakehouse.bronze.get_yaml_config")
-    def test_get_stats_returns_dict(
-        self, mock_yaml: MagicMock, mock_settings: MagicMock
-    ) -> None:
+    def test_get_stats_returns_dict(self, mock_yaml: MagicMock, mock_settings: MagicMock) -> None:
         """Verify get_stats returns a dictionary with expected keys."""
-        mock_settings.return_value = MagicMock(
-            lakehouse=MagicMock(bronze_path="/test/bronze")
-        )
+        mock_settings.return_value = MagicMock(lakehouse=MagicMock(bronze_path="/test/bronze"))
         mock_yaml.return_value = {"lakehouse": {"bronze": {}}}
 
         from src.lakehouse.bronze import BronzeLayer
@@ -232,9 +208,7 @@ class TestBronzeLayerStats:
         self, mock_yaml: MagicMock, mock_settings: MagicMock
     ) -> None:
         """Verify get_stats returns error dict on failure."""
-        mock_settings.return_value = MagicMock(
-            lakehouse=MagicMock(bronze_path="/nonexistent")
-        )
+        mock_settings.return_value = MagicMock(lakehouse=MagicMock(bronze_path="/nonexistent"))
         mock_yaml.return_value = {"lakehouse": {"bronze": {}}}
 
         from src.lakehouse.bronze import BronzeLayer
@@ -254,9 +228,7 @@ class TestBronzeLayerStats:
         self, mock_yaml: MagicMock, mock_settings: MagicMock
     ) -> None:
         """Verify cleanup_expired returns 0 (safety mode)."""
-        mock_settings.return_value = MagicMock(
-            lakehouse=MagicMock(bronze_path="/test/bronze")
-        )
+        mock_settings.return_value = MagicMock(lakehouse=MagicMock(bronze_path="/test/bronze"))
         mock_yaml.return_value = {"lakehouse": {"bronze": {}}}
 
         from src.lakehouse.bronze import BronzeLayer

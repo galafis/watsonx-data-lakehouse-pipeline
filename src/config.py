@@ -6,7 +6,6 @@ providing typed access to all pipeline configuration.
 
 from __future__ import annotations
 
-import os
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -53,9 +52,7 @@ class SparkSettings(BaseSettings):
 
     master: str = Field(default="local[*]", alias="SPARK_MASTER")
     app_name: str = Field(default="watsonx-lakehouse-pipeline", alias="SPARK_APP_NAME")
-    warehouse_dir: str = Field(
-        default="s3a://lakehouse/warehouse", alias="SPARK_WAREHOUSE_DIR"
-    )
+    warehouse_dir: str = Field(default="s3a://lakehouse/warehouse", alias="SPARK_WAREHOUSE_DIR")
 
 
 class LakehouseSettings(BaseSettings):

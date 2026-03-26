@@ -13,8 +13,6 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 from src.governance.lineage import (
     LayerType,
     LineageGraph,
@@ -284,9 +282,7 @@ class TestSLAMonitor:
     @patch("src.governance.sla_monitor.get_yaml_config")
     def test_check_freshness_compliant(self, mock_yaml: MagicMock) -> None:
         """Verify freshness check returns COMPLIANT for recent data."""
-        mock_yaml.return_value = {
-            "governance": {"sla": {"freshness_threshold_minutes": 30}}
-        }
+        mock_yaml.return_value = {"governance": {"sla": {"freshness_threshold_minutes": 30}}}
         monitor = SLAMonitor()
 
         recent_time = datetime.utcnow() - timedelta(minutes=10)
@@ -298,9 +294,7 @@ class TestSLAMonitor:
     @patch("src.governance.sla_monitor.get_yaml_config")
     def test_check_freshness_warning(self, mock_yaml: MagicMock) -> None:
         """Verify freshness check returns WARNING for slightly stale data."""
-        mock_yaml.return_value = {
-            "governance": {"sla": {"freshness_threshold_minutes": 30}}
-        }
+        mock_yaml.return_value = {"governance": {"sla": {"freshness_threshold_minutes": 30}}}
         monitor = SLAMonitor()
 
         stale_time = datetime.utcnow() - timedelta(minutes=40)
@@ -311,9 +305,7 @@ class TestSLAMonitor:
     @patch("src.governance.sla_monitor.get_yaml_config")
     def test_check_freshness_violated(self, mock_yaml: MagicMock) -> None:
         """Verify freshness check returns VIOLATED for very stale data."""
-        mock_yaml.return_value = {
-            "governance": {"sla": {"freshness_threshold_minutes": 30}}
-        }
+        mock_yaml.return_value = {"governance": {"sla": {"freshness_threshold_minutes": 30}}}
         monitor = SLAMonitor()
 
         very_stale = datetime.utcnow() - timedelta(hours=2)
@@ -324,9 +316,7 @@ class TestSLAMonitor:
     @patch("src.governance.sla_monitor.get_yaml_config")
     def test_check_freshness_unknown(self, mock_yaml: MagicMock) -> None:
         """Verify freshness check returns UNKNOWN for None timestamp."""
-        mock_yaml.return_value = {
-            "governance": {"sla": {"freshness_threshold_minutes": 30}}
-        }
+        mock_yaml.return_value = {"governance": {"sla": {"freshness_threshold_minutes": 30}}}
         monitor = SLAMonitor()
 
         check = monitor.check_freshness(None)
@@ -335,9 +325,7 @@ class TestSLAMonitor:
     @patch("src.governance.sla_monitor.get_yaml_config")
     def test_check_completeness_compliant(self, mock_yaml: MagicMock) -> None:
         """Verify completeness check returns COMPLIANT above threshold."""
-        mock_yaml.return_value = {
-            "governance": {"sla": {"completeness_threshold_percent": 95.0}}
-        }
+        mock_yaml.return_value = {"governance": {"sla": {"completeness_threshold_percent": 95.0}}}
         monitor = SLAMonitor()
 
         check = monitor.check_completeness(expected_count=1000, actual_count=980)
@@ -348,9 +336,7 @@ class TestSLAMonitor:
     @patch("src.governance.sla_monitor.get_yaml_config")
     def test_check_completeness_warning(self, mock_yaml: MagicMock) -> None:
         """Verify completeness check returns WARNING near threshold."""
-        mock_yaml.return_value = {
-            "governance": {"sla": {"completeness_threshold_percent": 95.0}}
-        }
+        mock_yaml.return_value = {"governance": {"sla": {"completeness_threshold_percent": 95.0}}}
         monitor = SLAMonitor()
 
         check = monitor.check_completeness(expected_count=1000, actual_count=870)
@@ -360,9 +346,7 @@ class TestSLAMonitor:
     @patch("src.governance.sla_monitor.get_yaml_config")
     def test_check_completeness_violated(self, mock_yaml: MagicMock) -> None:
         """Verify completeness check returns VIOLATED below threshold."""
-        mock_yaml.return_value = {
-            "governance": {"sla": {"completeness_threshold_percent": 95.0}}
-        }
+        mock_yaml.return_value = {"governance": {"sla": {"completeness_threshold_percent": 95.0}}}
         monitor = SLAMonitor()
 
         check = monitor.check_completeness(expected_count=1000, actual_count=500)
@@ -372,9 +356,7 @@ class TestSLAMonitor:
     @patch("src.governance.sla_monitor.get_yaml_config")
     def test_check_completeness_zero_expected(self, mock_yaml: MagicMock) -> None:
         """Verify completeness is 100% when expected_count is 0."""
-        mock_yaml.return_value = {
-            "governance": {"sla": {"completeness_threshold_percent": 95.0}}
-        }
+        mock_yaml.return_value = {"governance": {"sla": {"completeness_threshold_percent": 95.0}}}
         monitor = SLAMonitor()
 
         check = monitor.check_completeness(expected_count=0, actual_count=0)
@@ -385,9 +367,7 @@ class TestSLAMonitor:
     @patch("src.governance.sla_monitor.get_yaml_config")
     def test_check_history_maintained(self, mock_yaml: MagicMock) -> None:
         """Verify check results are stored in history."""
-        mock_yaml.return_value = {
-            "governance": {"sla": {"freshness_threshold_minutes": 30}}
-        }
+        mock_yaml.return_value = {"governance": {"sla": {"freshness_threshold_minutes": 30}}}
         monitor = SLAMonitor()
 
         monitor.check_freshness(datetime.utcnow())

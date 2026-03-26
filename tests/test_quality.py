@@ -8,10 +8,7 @@ Tests cover:
 
 from __future__ import annotations
 
-from datetime import datetime
 from unittest.mock import MagicMock, patch
-
-import pytest
 
 from src.quality.expectations import (
     ExpectationResult,
@@ -119,8 +116,13 @@ class TestIoTDataQualitySuite:
 
         mock_df = MagicMock()
         mock_df.columns = [
-            "event_id", "sensor_id", "sensor_type", "facility_id",
-            "timestamp", "value", "unit",
+            "event_id",
+            "sensor_id",
+            "sensor_type",
+            "facility_id",
+            "timestamp",
+            "value",
+            "unit",
         ]
 
         results = suite.check_schema(mock_df)
@@ -167,8 +169,13 @@ class TestIoTDataQualitySuite:
 
         mock_df = MagicMock()
         mock_df.columns = [
-            "event_id", "sensor_id", "sensor_type", "facility_id",
-            "timestamp", "value", "unit",
+            "event_id",
+            "sensor_id",
+            "sensor_type",
+            "facility_id",
+            "timestamp",
+            "value",
+            "unit",
         ]
 
         with patch.object(suite, "check_nulls", return_value=[]):

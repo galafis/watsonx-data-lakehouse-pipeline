@@ -12,17 +12,13 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 
 class TestGoldLayerInit:
     """Tests for GoldLayer initialization."""
 
     @patch("src.lakehouse.gold.get_settings")
     @patch("src.lakehouse.gold.get_yaml_config")
-    def test_initialization(
-        self, mock_yaml: MagicMock, mock_settings: MagicMock
-    ) -> None:
+    def test_initialization(self, mock_yaml: MagicMock, mock_settings: MagicMock) -> None:
         """Verify GoldLayer initializes with correct paths and config."""
         mock_settings.return_value = MagicMock(
             lakehouse=MagicMock(
@@ -79,7 +75,7 @@ class TestGoldLayerAggregateKPIs:
         agg_result.withColumn.return_value = agg_result
         agg_result.drop.return_value = agg_result
 
-        result = layer.aggregate_kpis(mock_df)
+        layer.aggregate_kpis(mock_df)
 
         mock_df.withColumn.assert_called_once()
 
@@ -89,9 +85,7 @@ class TestGoldLayerAnomalyScores:
 
     @patch("src.lakehouse.gold.get_settings")
     @patch("src.lakehouse.gold.get_yaml_config")
-    def test_compute_anomaly_scores(
-        self, mock_yaml: MagicMock, mock_settings: MagicMock
-    ) -> None:
+    def test_compute_anomaly_scores(self, mock_yaml: MagicMock, mock_settings: MagicMock) -> None:
         """Verify anomaly scoring computes composite scores with severity levels."""
         mock_settings.return_value = MagicMock(
             lakehouse=MagicMock(gold_path="/test/gold", silver_path="/test/silver")
@@ -110,7 +104,7 @@ class TestGoldLayerAnomalyScores:
         grouped.agg.return_value = agg_result
         agg_result.withColumn.return_value = agg_result
 
-        result = layer.compute_anomaly_scores(mock_df)
+        layer.compute_anomaly_scores(mock_df)
 
         mock_df.groupBy.assert_called_once()
 
@@ -197,9 +191,7 @@ class TestGoldLayerRead:
 
     @patch("src.lakehouse.gold.get_settings")
     @patch("src.lakehouse.gold.get_yaml_config")
-    def test_read_anomaly_scores(
-        self, mock_yaml: MagicMock, mock_settings: MagicMock
-    ) -> None:
+    def test_read_anomaly_scores(self, mock_yaml: MagicMock, mock_settings: MagicMock) -> None:
         """Verify read_anomaly_scores reads from correct path."""
         mock_settings.return_value = MagicMock(
             lakehouse=MagicMock(gold_path="/test/gold", silver_path="/test/silver")

@@ -6,7 +6,7 @@ snapshot management, and table maintenance operations.
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 from pyspark.sql import DataFrame, SparkSession
@@ -70,8 +70,8 @@ class IcebergManager:
     def time_travel(
         self,
         table_name: str,
-        snapshot_id: Optional[int] = None,
-        as_of_timestamp: Optional[str] = None,
+        snapshot_id: int | None = None,
+        as_of_timestamp: str | None = None,
     ) -> DataFrame:
         """Query an Iceberg table at a specific point in time.
 
@@ -147,16 +147,12 @@ class IcebergManager:
 
         if add_columns:
             for col_name, col_type in add_columns.items():
-                self.spark.sql(
-                    f"ALTER TABLE {full_name} ADD COLUMN {col_name} {col_type}"
-                )
+                self.spark.sql(f"ALTER TABLE {full_name} ADD COLUMN {col_name} {col_type}")
                 logger.info("column_added", table=full_name, column=col_name, type=col_type)
 
         if rename_columns:
             for old_name, new_name in rename_columns.items():
-                self.spark.sql(
-                    f"ALTER TABLE {full_name} RENAME COLUMN {old_name} TO {new_name}"
-                )
+                self.spark.sql(f"ALTER TABLE {full_name} RENAME COLUMN {old_name} TO {new_name}")
                 logger.info("column_renamed", table=full_name, old=old_name, new=new_name)
 
     def expire_snapshots(self, table_name: str, older_than: str) -> None:
@@ -180,7 +176,5 @@ class IcebergManager:
             table_name: Fully qualified table name.
         """
         full_name = f"{self.catalog}.{table_name}"
-        self.spark.sql(
-            f"CALL {self.catalog}.system.rewrite_data_files(table => '{full_name}')"
-        )
+        self.spark.sql(f"CALL {self.catalog}.system.rewrite_data_files(table => '{full_name}')")
         logger.info("data_files_compacted", table=full_name)
