@@ -1,0 +1,122 @@
+# =============================================================================
+# Watsonx Data Lakehouse Pipeline - Configuration
+# =============================================================================
+
+spark:
+  app_name: "watsonx-lakehouse-pipeline"
+  master: "local[*]"
+  warehouse_dir: "s3a://lakehouse/warehouse"
+  packages:
+    - "org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.5.0"
+    - "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0"
+    - "org.apache.hadoop:hadoop-aws:3.3.6"
+  config:
+    spark.sql.extensions: "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions"
+    spark.sql.catalog.lakehouse: "org.apache.iceberg.spark.SparkCatalog"
+    spark.sql.catalog.lakehouse.type: "hadoop"
+    spark.sql.catalog.lakehouse.warehouse: "s3a://lakehouse/warehouse"
+    spark.hadoop.fs.s3a.endpoint: "http://localhost:9000"
+    spark.hadoop.fs.s3a.access.key: "minioadmin"
+    spark.hadoop.fs.s3a.secret.key: "minioadmin"
+    spark.hadoop.fs.s3a.path.style.access: "true"
+    spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+
+kafka:
+  bootstrap_servers: "localhost:9092"
+  topics:
+    iot_events: "iot-sensor-events"
+    anomaly_alerts: "anomaly-alerts"
+  consumer_group: "lakehouse-pipeline"
+  producer:
+    batch_size: 100
+    linger_ms: 50
+    compression_type: "gzip"
+  consumer:
+    auto_offset_reset: "earliest"
+    enable_auto_commit: false
+    max_poll_records: 500
+
+lakehouse:
+  bronze:
+    path: "s3a://lakehouse/bronze"
+    partition_columns: ["event_date", "sensor_type"]
+    retention_days: 90
+    checkpoint_dir: "s3a://lakehouse/checkpoints/bronze"
+  silver:
+    path: "s3a://lakehouse/silver"
+    partition_columns: ["event_date", "facility_id"]
+    dedup_window_hours: 24
+    checkpoint_dir: "s3a://lakehouse/checkpoints/silver"
+  gold:
+    path: "s3a://lakehouse/gold"
+    partition_columns: ["kpi_date", "facility_id"]
+    aggregation_window_minutes: 15
+    checkpoint_dir: "s3a://lakehouse/checkpoints/gold"
+
+quality:
+  expectations:
+    temperature:
+      min_value: -50.0
+      max_value: 500.0
+      null_threshold: 0.01
+    vibration:
+      min_value: 0.0
+      max_value: 100.0
+      null_threshold: 0.02
+    pressure:
+      min_value: 0.0
+      max_value: 1000.0
+      null_threshold: 0.01
+    throughput:
+      min_value: 0.0
+      max_value: 10000.0
+      null_threshold: 0.05
+  profiling:
+    sample_size: 10000
+    report_format: "html"
+
+governance:
+  lineage:
+    tracking_enabled: true
+    storage_path: "s3a://lakehouse/lineage"
+  sla:
+    freshness_threshold_minutes: 30
+    completeness_threshold_percent: 95.0
+    alert_channels: ["log", "api"]
+
+watsonx:
+  model_id: "ibm/granite-13b-chat-v2"
+  parameters:
+    max_new_tokens: 512
+    temperature: 0.3
+    top_p: 0.9
+    repetition_penalty: 1.1
+
+simulator:
+  sensors:
+    - name: "temperature"
+      unit: "celsius"
+      baseline: 75.0
+      std_dev: 5.0
+      anomaly_probability: 0.05
+    - name: "vibration"
+      unit: "mm/s"
+      baseline: 2.5
+      std_dev: 0.5
+      anomaly_probability: 0.03
+    - name: "pressure"
+      unit: "bar"
+      baseline: 6.0
+      std_dev: 0.3
+      anomaly_probability: 0.02
+    - name: "throughput"
+      unit: "units/hr"
+      baseline: 150.0
+      std_dev: 10.0
+      anomaly_probability: 0.04
+  facilities:
+    - "PLANT-A"
+    - "PLANT-B"
+    - "PLANT-C"
+  sampling_interval_seconds: 5
+  num_sensors_per_type: 10
